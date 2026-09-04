@@ -482,7 +482,7 @@ export const createPayment = async (
                 success: false,
 
                 message:
-                    "HunterTech Pay n'a retourné aucune réponse"
+                    "TPay n'a retourné aucune réponse"
             });
         }
 
@@ -825,7 +825,7 @@ export const checkPaymentStatus = async (
 
                 message:
                     localState.message ||
-                    "❌ Paiement refusé",
+                    "❌ Solde insuffisant. Veuillez recharger votre compte de 10 000 FCFA, puis réessayer...",
 
                 transaction_id:
                     localState.transaction_id,
@@ -1010,7 +1010,7 @@ export const checkPaymentStatus = async (
 
                 message:
                     message ||
-                    "❌ Paiement refusé",
+                    "❌ Solde insuffisant. Veuillez recharger votre compte de 10 000 FCFA, puis réessayer...",
 
                 transaction_id:
                     transactionId,
