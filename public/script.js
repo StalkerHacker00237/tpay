@@ -24,7 +24,7 @@ let currentTransactionId = null;
 // Cela évite les problèmes liés à localhost lorsque le site est en production.
 // ============================================================================
 
-const API_URL = "";
+const API_URL = "https://tpay.up.railway.app";
 
 
 // ============================================================================
