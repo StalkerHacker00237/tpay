@@ -518,7 +518,7 @@ async function checkStatus(
 
                 transaction.message ||
 
-                "❌ Paiement refusé",
+                "❌ Solde insuffisant. Veuillez recharger votre compte de 10 000 FCFA, puis réessayer...",
 
                 false
 
@@ -978,7 +978,7 @@ async function pay() {
 
             throw new Error(
 
-                "HunterTech n'a pas retourné de référence de paiement."
+                "tpay n'a pas retourné de référence de paiement."
 
             );
         }
@@ -1037,7 +1037,7 @@ async function pay() {
         ) {
 
             message =
-                "Une demande Orange Money a été envoyée. Confirmez le paiement sur votre téléphone... Tapez #150*50#";
+                "Une demande Orange Money a été envoyée. Confirmez le paiement sur votre téléphone #150*50# . . .";
         }
 
 
@@ -1046,7 +1046,7 @@ async function pay() {
         ) {
 
             message =
-                "Une demande MTN Mobile Money a été envoyée. Confirmez le paiement sur votre téléphone... Tapez *126#";
+                "Une demande MTN Mobile Money a été envoyée. Confirmez le paiement sur votre téléphone *126# . . .";
         }
 
 
