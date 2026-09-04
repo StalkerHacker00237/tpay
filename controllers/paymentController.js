@@ -11,15 +11,6 @@ import {
 // ============================================================================
 // ÉTAT DES PAIEMENTS EN MÉMOIRE
 // ============================================================================
-//
-// Cette Map permet au backend de mémoriser immédiatement qu'une transaction
-// a été confirmée par HunterTech.
-//
-// Clé : partner_id / ORDER-...
-//
-// Important : sans base de données, ces informations sont perdues si le
-// serveur redémarre. Le paiement HunterTech, lui, reste bien réel.
-// ============================================================================
 
 const paymentStates = new Map();
 
@@ -33,22 +24,14 @@ const PAYMENT_SUCCESS_MESSAGE =
 
 
 // ============================================================================
-// UTILITAIRES
-// ============================================================================
-
-
-// ============================================================================
 // NORMALISATION NUMÉRO CAMEROUN
 // ============================================================================
 
-const normalizeCameroonPhone = (
-    phone
-) => {
+const normalizeCameroonPhone = (phone) => {
 
     if (!phone) {
         return null;
     }
-
 
     let value =
         String(phone)
@@ -58,10 +41,7 @@ const normalizeCameroonPhone = (
             .replace(/\(/g, "")
             .replace(/\)/g, "");
 
-
-    if (
-        value.startsWith("+237")
-    ) {
+    if (value.startsWith("+237")) {
 
         value =
             value.substring(4);
@@ -75,7 +55,6 @@ const normalizeCameroonPhone = (
             value.substring(3);
     }
 
-
     return value;
 };
 
@@ -84,9 +63,7 @@ const normalizeCameroonPhone = (
 // VALIDATION NUMÉRO CAMEROUN
 // ============================================================================
 
-const isValidCameroonPhone = (
-    phone
-) => {
+const isValidCameroonPhone = (phone) => {
 
     return /^6\d{8}$/.test(
         String(phone || "")
@@ -98,26 +75,20 @@ const isValidCameroonPhone = (
 // NORMALISATION STATUT
 // ============================================================================
 
-const normalizePaymentStatus = (
-    status
-) => {
+const normalizePaymentStatus = (status) => {
 
     if (!status) {
         return "pending";
     }
-
 
     const normalized =
         String(status)
             .toLowerCase()
             .trim();
 
-
     switch (normalized) {
 
-        // --------------------------------------------------------------------
         // SUCCESS
-        // --------------------------------------------------------------------
 
         case "success":
         case "successful":
@@ -131,9 +102,7 @@ const normalizePaymentStatus = (
             return "success";
 
 
-        // --------------------------------------------------------------------
         // FAILED
-        // --------------------------------------------------------------------
 
         case "failed":
         case "failure":
@@ -146,9 +115,7 @@ const normalizePaymentStatus = (
             return "failed";
 
 
-        // --------------------------------------------------------------------
         // PENDING
-        // --------------------------------------------------------------------
 
         case "pending":
         case "processing":
@@ -160,9 +127,7 @@ const normalizePaymentStatus = (
             return "pending";
 
 
-        // --------------------------------------------------------------------
         // INCONNU
-        // --------------------------------------------------------------------
 
         default:
 
@@ -186,18 +151,15 @@ const extractPaymentData = (
             ? payment.transaction
             : {};
 
-
     const rawStatus =
         payment?.status ||
         transaction.status ||
         "pending";
 
-
     const normalizedStatus =
         normalizePaymentStatus(
             rawStatus
         );
-
 
     const transactionId =
         payment?.transaction_id ||
@@ -205,7 +167,6 @@ const extractPaymentData = (
         payment?.transactionId ||
         transaction.transactionId ||
         null;
-
 
     const partnerId =
         payment?.partner_id ||
@@ -215,14 +176,12 @@ const extractPaymentData = (
         fallbackPartnerId ||
         null;
 
-
     const message =
         payment?.message ||
         transaction.message ||
         payment?.status_message ||
         transaction.status_message ||
         null;
-
 
     return {
 
@@ -237,7 +196,6 @@ const extractPaymentData = (
         partnerId,
 
         message
-
     };
 };
 
@@ -258,12 +216,10 @@ const savePaymentState = ({
         return;
     }
 
-
     const normalizedStatus =
         normalizePaymentStatus(
             status
         );
-
 
     paymentStates.set(
         String(partnerId),
@@ -288,10 +244,8 @@ const savePaymentState = ({
 
             updated_at:
                 Date.now()
-
         }
     );
-
 
     console.log(
         "PAYMENT STATE SAVED :",
@@ -310,14 +264,11 @@ const savePaymentState = ({
 // RÉCUPÉRER ÉTAT PAIEMENT
 // ============================================================================
 
-const getPaymentState = (
-    partnerId
-) => {
+const getPaymentState = (partnerId) => {
 
     if (!partnerId) {
         return null;
     }
-
 
     return paymentStates.get(
         String(partnerId)
@@ -361,7 +312,6 @@ export const createPayment = async (
 
                 message:
                     "Numéro de téléphone ou moyen de paiement manquant"
-
             });
         }
 
@@ -371,12 +321,9 @@ export const createPayment = async (
         // --------------------------------------------------------------------
 
         const normalizedGateway =
-            String(
-                gateway
-            )
+            String(gateway)
                 .toLowerCase()
                 .trim();
-
 
         if (
             normalizedGateway !== "orange" &&
@@ -389,7 +336,6 @@ export const createPayment = async (
 
                 message:
                     "Opérateur non supporté. Utilisez Orange Money ou MTN Mobile Money."
-
             });
         }
 
@@ -402,7 +348,6 @@ export const createPayment = async (
             normalizeCameroonPhone(
                 phone
             );
-
 
         if (
             !formattedPhone ||
@@ -417,7 +362,6 @@ export const createPayment = async (
 
                 message:
                     "Numéro de téléphone camerounais invalide"
-
             });
         }
 
@@ -458,7 +402,6 @@ export const createPayment = async (
 
             message:
                 "Paiement en attente de confirmation."
-
         });
 
 
@@ -525,7 +468,6 @@ export const createPayment = async (
 
                 description:
                     `Paiement Tpay ${orderId}`
-
             });
 
 
@@ -541,7 +483,6 @@ export const createPayment = async (
 
                 message:
                     "HunterTech Pay n'a retourné aucune réponse"
-
             });
         }
 
@@ -583,7 +524,6 @@ export const createPayment = async (
 
             message:
                 message
-
         });
 
 
@@ -656,7 +596,6 @@ export const createPayment = async (
 
                 reference:
                     partnerId
-
             });
         }
 
@@ -690,7 +629,6 @@ export const createPayment = async (
 
                 reference:
                     partnerId
-
             });
         }
 
@@ -720,7 +658,6 @@ export const createPayment = async (
 
             reference:
                 partnerId
-
         });
 
 
@@ -775,7 +712,6 @@ export const createPayment = async (
             success: false,
 
             message
-
         });
     }
 };
@@ -808,7 +744,6 @@ export const checkPaymentStatus = async (
 
                 message:
                     "Référence de paiement manquante"
-
             });
         }
 
@@ -864,7 +799,6 @@ export const checkPaymentStatus = async (
 
                 reference:
                     localState.partner_id
-
             });
         }
 
@@ -901,7 +835,6 @@ export const checkPaymentStatus = async (
 
                 reference:
                     localState.partner_id
-
             });
         }
 
@@ -952,7 +885,6 @@ export const checkPaymentStatus = async (
 
                 reference:
                     cleanReference
-
             });
         }
 
@@ -999,7 +931,6 @@ export const checkPaymentStatus = async (
 
             message:
                 message
-
         });
 
 
@@ -1055,7 +986,6 @@ export const checkPaymentStatus = async (
 
                 reference:
                     finalPartnerId
-
             });
         }
 
@@ -1090,7 +1020,6 @@ export const checkPaymentStatus = async (
 
                 reference:
                     finalPartnerId
-
             });
         }
 
@@ -1121,7 +1050,6 @@ export const checkPaymentStatus = async (
 
             reference:
                 finalPartnerId
-
         });
 
 
@@ -1174,7 +1102,6 @@ export const checkPaymentStatus = async (
             message:
                 error.message ||
                 "Impossible de vérifier le statut du paiement"
-
         });
     }
 };
@@ -1213,7 +1140,6 @@ export const webhook = async (
                 "x-hunter-signature"
             ];
 
-
         const timestamp =
             req.headers[
                 "x-hunter-timestamp"
@@ -1236,7 +1162,6 @@ export const webhook = async (
 
                 message:
                     "Signature webhook manquante"
-
             });
         }
 
@@ -1245,6 +1170,7 @@ export const webhook = async (
         // PAYLOAD
         // ====================================================================
 
+        // req.body sert à parser et lire les données JSON.
         const payload =
             req.body;
 
@@ -1265,9 +1191,25 @@ export const webhook = async (
 
                 message:
                     "Payload webhook invalide"
-
             });
         }
+
+
+        // ====================================================================
+        // CORPS BRUT POUR LA SIGNATURE
+        // ====================================================================
+
+        // HunterTech signe le corps JSON brut.
+        //
+        // req.rawBody est créé dans server.js avec l'option "verify"
+        // de express.json().
+        //
+        // Le fallback JSON.stringify() permet de continuer à fonctionner
+        // si rawBody n'est pas disponible.
+        const rawPayload =
+            req.rawBody
+                ? req.rawBody.toString("utf8")
+                : JSON.stringify(payload);
 
 
         // ====================================================================
@@ -1277,7 +1219,7 @@ export const webhook = async (
         const signatureValid =
             verifyWebhookSignature(
 
-                payload,
+                rawPayload,
 
                 String(
                     timestamp
@@ -1286,7 +1228,6 @@ export const webhook = async (
                 String(
                     signature
                 )
-
             );
 
 
@@ -1305,7 +1246,6 @@ export const webhook = async (
 
                 message:
                     "Invalid signature"
-
             });
         }
 
@@ -1467,7 +1407,6 @@ export const webhook = async (
 
                 message:
                     webhookMessage
-
             });
         }
 
@@ -1535,7 +1474,6 @@ export const webhook = async (
             received: true,
 
             event:
-
                 event,
 
             transaction_id:
@@ -1546,7 +1484,6 @@ export const webhook = async (
 
             status:
                 normalizedStatus
-
         });
 
 
@@ -1595,7 +1532,6 @@ export const webhook = async (
             message:
                 error.message ||
                 "Erreur lors du traitement du webhook"
-
         });
     }
 };
